@@ -14,7 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LandmarkRemark">
-        <activity android:name=".presentation.usersetup.UserSetupActivity"></activity>
+        <activity android:name=".presentation.home.HomeActivity"
+            android:theme="@style/Theme.LandmarkRemark.NoActionBar"/>
+        <activity android:name=".presentation.usersetup.UserSetupActivity"
+            android:theme="@style/Theme.LandmarkRemark.NoActionBar"/>
         <activity
             android:name=".presentation.splash.SplashActivity"
             android:theme="@style/Theme.LandmarkRemark.NoActionBar">
