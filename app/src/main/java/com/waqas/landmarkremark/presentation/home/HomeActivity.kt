@@ -17,6 +17,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.waqas.landmarkremark.BuildConfig
 import com.waqas.landmarkremark.R
 import com.waqas.landmarkremark.databinding.ActivityHomeBinding
@@ -29,7 +30,6 @@ import com.waqas.landmarkremark.presentation.home.viewmodels.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import java.lang.Exception
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -48,7 +48,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         prefs = SharedPrefs(applicationContext)
         observe()
         getAllNotes()
-        fiterNotes()
+        filterNotes()
         initMap(savedInstanceState)
         showMyLocation()
         saveNotes()
@@ -128,6 +128,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         getLocation()
+        getAllNotes()
         binding.mapView.onResume()
     }
 
@@ -164,6 +165,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
             val latLng = LatLng(currentLocation?.latitude!!, currentLocation?.longitude!!)
             HomeUtils.drawCurrentLocationMarker(this,mMap, latLng)
         }
+        HomeUtils.setMarkers(viewModel.getCachedNotes(),getCurrentUser(),mMap)
     }
 
 
@@ -195,13 +197,9 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun fiterNotes(){
-        try{
-            mMap.clear()
-        }
-        catch (e: Exception){
-        }
+    private fun filterNotes(){
         binding.homeShowNotesSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            HomeUtils.removeAllMarkers()
             if(isChecked){
                 HomeUtils.setCurrentUserMarkers(viewModel.getCachedNotes(),getCurrentUser(),mMap)
             }
@@ -229,5 +227,6 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         private const val LOCATION_REQUEST_CODE = 111
+        var markerList : ArrayList<Marker?> = ArrayList()
     }
 }

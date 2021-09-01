@@ -5,16 +5,18 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.waqas.landmarkremark.R
 import com.waqas.landmarkremark.domain.home.entity.NoteEntity
+import com.waqas.landmarkremark.presentation.home.HomeActivity
 
 object HomeUtils {
     fun drawCurrentLocationMarker(context: Context, googleMap: GoogleMap, latLng: LatLng){
         val options = MarkerOptions().position(latLng).
         title(context.getString(R.string.my_location_title)).
         icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18.0F))
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5.0F))
         googleMap.addMarker(options).showInfoWindow()
 
     }
@@ -24,7 +26,8 @@ object HomeUtils {
         title(username).
         snippet(note)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-        googleMap.addMarker(options)
+        HomeActivity.markerList.add(googleMap.addMarker(options))
+
     }
 
     fun drawUserMarker(googleMap: GoogleMap, latLng: LatLng, username: String, note: String){
@@ -32,7 +35,7 @@ object HomeUtils {
         title(username).
         snippet(note)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-        googleMap.addMarker(options)
+        HomeActivity.markerList.add(googleMap.addMarker(options))
     }
 
     fun setMarkers(notes: List<NoteEntity>, username: String, googleMap: GoogleMap){
@@ -56,5 +59,12 @@ object HomeUtils {
 
     fun getLatLng(lat: Double, lng: Double): LatLng{
         return LatLng(lat,lng)
+    }
+
+    fun removeAllMarkers(){
+        for(marker in HomeActivity.markerList){
+            marker?.isVisible = false
+            marker?.remove()
+        }
     }
 }
