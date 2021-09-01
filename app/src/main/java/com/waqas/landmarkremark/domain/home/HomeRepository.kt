@@ -9,4 +9,5 @@ interface HomeRepository {
     var allNotes: List<NoteEntity>
     suspend fun getAllNotes(): Flow<BaseResult<List<NoteEntity>, String>>
     fun getCachedNotes(): List<NoteEntity>
+    suspend fun addNote(note: NoteEntity): Flow<BaseResult<String, String>>
 }

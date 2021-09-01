@@ -1,22 +1,6 @@
 <resources>
     <string name="app_name">Landmark Remark</string>
-    <string name="header_login">Sign In</string>
-    <string name="header_desc_login">Sign in to get all the features of the app</string>
-    <string name="hint_login_email_edit_text">Email</string>
-    <string name="hint_login_password_edit_text">Password</string>
     <string name="button_text_login">Log In</string>
-    <string name="button_text_dont_have_account">I dont have account</string>
-    <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    <string name="error_email_not_valid">Email is not valid</string>
-    <string name="error_password_not_valid">Password is not valid</string>
     <string name="save_notes_here">Save notes here</string>
     <string name="user_log_in">Log in</string>
     <string name="user_name_info">Enter username to continue</string>
@@ -27,4 +11,12 @@
     <string name="my_location_title">I\'m here right now</string>
     <string name="curr_loc_title">My current location</string>
     <string name="current_user">You</string>
+    <string name="save_note_header_text">Enter note below</string>
+    <string name="hint_note_edit_text">Note</string>
+    <string name="save_btn_label">Save</string>
+    <string name="cancel_btn_label">Cancel</string>
+    <string name="no_location_available">No location available</string>
+    <string name="retrieval_error">Error retrieving notes</string>
+    <string name="additon_successful">Note added successfully</string>
+    <string name="addition_error">Error in note addition</string>
 </resources>

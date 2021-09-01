@@ -20,9 +20,20 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
+        android:elevation="@dimen/elevation"
         android:indeterminateTint="@color/purple_500"
         android:visibility="gone"
         />
+
+    <ImageButton
+        android:id="@+id/home_logout_btn"
+        android:layout_width="@dimen/button_size"
+        android:layout_height="@dimen/button_size"
+        android:layout_margin="@dimen/margin_small"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/button_bg1"
+        android:elevation="@dimen/elevation"
+        android:src="@drawable/logout_icon"/>
 
     <LinearLayout
         android:id="@+id/home_buttons_layout"

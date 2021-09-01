@@ -1,6 +1,7 @@
 package com.waqas.landmarkremark.data.home.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import com.waqas.landmarkremark.domain.base.BaseResult
 import com.waqas.landmarkremark.domain.home.HomeRepository
 import com.waqas.landmarkremark.domain.home.entity.NoteEntity
@@ -37,12 +38,40 @@ class HomeRepositoryImp() : HomeRepository {
                 emit(BaseResult.Success(allNotes))
             }
             else{
-                emit(BaseResult.Error("Firebase error"))
+                emit(BaseResult.Error(AppConstants.ERROR))
             }
         }
     }
 
     override fun getCachedNotes(): List<NoteEntity> {
         return allNotes
+    }
+
+    override suspend fun addNote(note: NoteEntity): Flow<BaseResult<String, String>> {
+        return flow {
+            var success = false
+            val db = FirebaseFirestore.getInstance()
+            val newNote : MutableMap<String, Any> = HashMap()
+            newNote[AppConstants.KEY_LAT] = note.latitude
+            newNote[AppConstants.KEY_LONG] = note.longitude
+            newNote[AppConstants.KEY_USERNAME] = note.userName
+            newNote[AppConstants.KEY_NOTES] = note.notes
+
+            db.collection(AppConstants.DB_COLLECTION)
+                    .add(newNote)
+                    .addOnSuccessListener {
+                        success = true
+                    }
+                    .addOnFailureListener {
+                        success = false
+                    }
+            if(success){
+                emit(BaseResult.Success(AppConstants.SUCCESS))
+            }
+            else{
+                emit(BaseResult.Error(AppConstants.ERROR))
+            }
+            getAllNotes()
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.waqas.landmarkremark.presentation.home
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +28,7 @@ import com.waqas.landmarkremark.infra.util.SharedPrefs
 import com.waqas.landmarkremark.presentation.home.utils.HomeUtils
 import com.waqas.landmarkremark.presentation.home.viewmodels.HomeActivityState
 import com.waqas.landmarkremark.presentation.home.viewmodels.HomeViewModel
+import com.waqas.landmarkremark.presentation.usersetup.UserSetupActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -52,6 +54,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         initMap(savedInstanceState)
         showMyLocation()
         saveNotes()
+        logout()
     }
     private fun getAllNotes() {
         viewModel.getAllNotes()
@@ -66,8 +69,10 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         when(state) {
             is HomeActivityState.Init -> Unit
             is HomeActivityState.IsLoading -> handleLoading(state.isLoading)
-            is HomeActivityState.SuccessResponse -> handleSuccesResponse(state.notes)
+            is HomeActivityState.SuccessResponse -> handleSuccessResponse(state.notes)
             is HomeActivityState.ErrorResponse -> handleErrorState(state.rawResponse)
+            is HomeActivityState.AdditionSuccess -> handleAdditionSuccess()
+            is HomeActivityState.AdditionError -> handleAdditionError()
         }
     }
 
@@ -81,12 +86,20 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    private fun handleSuccesResponse(notes: List<NoteEntity>){
+    private fun handleSuccessResponse(notes: List<NoteEntity>){
         HomeUtils.setMarkers(notes,getCurrentUser(),mMap)
     }
 
     private fun handleErrorState(msg: String){
+    }
 
+    private fun handleAdditionSuccess() {
+        Toast.makeText(this,getString(R.string.additon_successful),Toast.LENGTH_SHORT).show()
+        getAllNotes()
+    }
+
+    private fun handleAdditionError(){
+        getAllNotes()
     }
 
     private fun initMap(savedInstanceState: Bundle?) {
@@ -111,7 +124,12 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun saveNotes(){
         binding.saveNotesHereButton.setOnClickListener {
-            onMapReady(mMap)
+            if(currentLocation != null){
+                HomeUtils.saveDialogSetup(this,viewModel,currentLocation,getCurrentUser())
+            }
+            else {
+                Toast.makeText(this, getString(R.string.no_location_available), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -166,6 +184,14 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
             HomeUtils.drawCurrentLocationMarker(this,mMap, latLng)
         }
         HomeUtils.setMarkers(viewModel.getCachedNotes(),getCurrentUser(),mMap)
+    }
+
+    private fun logout(){
+        binding.homeLogoutBtn.setOnClickListener {
+            resetUser()
+            startActivity(Intent(this,UserSetupActivity::class.java))
+            finish()
+        }
     }
 
 
@@ -223,6 +249,10 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun getCurrentUser(): String{
         return  prefs.get(AppConstants.USERNAME, String::class.java)
+    }
+
+    private fun resetUser(){
+        prefs.clear(AppConstants.USERNAME)
     }
 
     companion object {

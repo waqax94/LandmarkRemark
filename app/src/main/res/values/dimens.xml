@@ -10,4 +10,8 @@
     <dimen name="padding_large">16dp</dimen>
     <dimen name="text_size_medium">20sp</dimen>
     <dimen name="button_size">50dp</dimen>
+    <dimen name="elevation">10dp</dimen>
+    <dimen name="dialog_width">320dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="splash_icon_size">80dp</dimen>
 </resources>

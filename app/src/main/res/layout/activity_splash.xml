@@ -7,15 +7,12 @@
     android:fitsSystemWindows="true"
     tools:context=".presentation.splash.SplashActivity">
 
-    <TextView
+    <ImageView
         android:id="@+id/splash_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textColor="@color/purple_500"
-        android:textSize="@dimen/text_size_large"
+        android:layout_width="@dimen/splash_icon_size"
+        android:layout_height="@dimen/splash_icon_size"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:fontFamily="sans-serif-medium"/>
+        android:src="@drawable/landmark_icon"/>
 
 </RelativeLayout>
