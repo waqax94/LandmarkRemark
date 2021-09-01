@@ -22,4 +22,6 @@
     <string name="user_name_info">Enter username to continue</string>
     <string name="hint_username_edit_text">Username</string>
     <string name="username_error">Username cannot be empty</string>
+    <string name="show_my_notes">Show my notes</string>
+    <string name="permission_denied">Location permission denied</string>
 </resources>
