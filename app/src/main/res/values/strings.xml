@@ -24,4 +24,7 @@
     <string name="username_error">Username cannot be empty</string>
     <string name="show_my_notes">Show my notes</string>
     <string name="permission_denied">Location permission denied</string>
+    <string name="my_location_title">I\'m here right now</string>
+    <string name="curr_loc_title">My current location</string>
+    <string name="current_user">You</string>
 </resources>

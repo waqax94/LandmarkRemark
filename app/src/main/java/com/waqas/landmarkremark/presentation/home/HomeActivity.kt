@@ -5,36 +5,90 @@ import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.waqas.landmarkremark.BuildConfig
 import com.waqas.landmarkremark.R
 import com.waqas.landmarkremark.databinding.ActivityHomeBinding
+import com.waqas.landmarkremark.domain.home.entity.NoteEntity
+import com.waqas.landmarkremark.infra.util.AppConstants
+import com.waqas.landmarkremark.infra.util.SharedPrefs
+import com.waqas.landmarkremark.presentation.home.utils.HomeUtils
+import com.waqas.landmarkremark.presentation.home.viewmodels.HomeActivityState
+import com.waqas.landmarkremark.presentation.home.viewmodels.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import java.lang.Exception
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var prefs: SharedPrefs
     private var currentLocation: Location? = null
     private lateinit var mMap : GoogleMap
+    private val viewModel: HomeViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        prefs = SharedPrefs(applicationContext)
+        observe()
+        getAllNotes()
+        fiterNotes()
         initMap(savedInstanceState)
         showMyLocation()
         saveNotes()
     }
+    private fun getAllNotes() {
+        viewModel.getAllNotes()
+    }
+    private fun observe() {
+        viewModel.mState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .onEach { state -> handleState(state) }
+                .launchIn(lifecycleScope)
+    }
+
+    private fun handleState(state: HomeActivityState){
+        when(state) {
+            is HomeActivityState.Init -> Unit
+            is HomeActivityState.IsLoading -> handleLoading(state.isLoading)
+            is HomeActivityState.SuccessResponse -> handleSuccesResponse(state.notes)
+            is HomeActivityState.ErrorResponse -> handleErrorState(state.rawResponse)
+        }
+    }
+
+    private fun handleLoading(set: Boolean){
+        if(set){
+            binding.homeProgress.visibility = View.VISIBLE
+        }
+        else {
+            binding.homeProgress.visibility = View.GONE
+        }
+
+    }
+
+    private fun handleSuccesResponse(notes: List<NoteEntity>){
+        HomeUtils.setMarkers(notes,getCurrentUser(),mMap)
+    }
+
+    private fun handleErrorState(msg: String){
+
+    }
+
     private fun initMap(savedInstanceState: Bundle?) {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -108,14 +162,10 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if(currentLocation != null){
             val latLng = LatLng(currentLocation?.latitude!!, currentLocation?.longitude!!)
-
-            val options = MarkerOptions().position(latLng).title("Current Location")
-
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18.0F))
-
-            mMap.addMarker(options)
+            HomeUtils.drawCurrentLocationMarker(this,mMap, latLng)
         }
     }
+
 
     private fun getLocation(){
         if (ActivityCompat.checkSelfPermission(
@@ -145,6 +195,22 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun fiterNotes(){
+        try{
+            mMap.clear()
+        }
+        catch (e: Exception){
+        }
+        binding.homeShowNotesSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked){
+                HomeUtils.setCurrentUserMarkers(viewModel.getCachedNotes(),getCurrentUser(),mMap)
+            }
+            else{
+                HomeUtils.setMarkers(viewModel.getCachedNotes(),getCurrentUser(),mMap)
+            }
+        }
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if(requestCode == LOCATION_REQUEST_CODE && grantResults.isNotEmpty()){
@@ -155,6 +221,10 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
                 Toast.makeText(this@HomeActivity, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun getCurrentUser(): String{
+        return  prefs.get(AppConstants.USERNAME, String::class.java)
     }
 
     companion object {
