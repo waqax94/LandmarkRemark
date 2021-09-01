@@ -39,6 +39,7 @@
                 android:layout_width="match_parent"
                 android:id="@+id/username_edit_text"
                 android:hint="@string/hint_username_edit_text"
+                android:maxLength="20"
                 android:layout_height="wrap_content"/>
         </com.google.android.material.textfield.TextInputLayout>
 
